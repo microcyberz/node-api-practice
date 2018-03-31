@@ -1,0 +1,17 @@
+// Mongo + robo3t installation 
+Extract Mongo
+navigate to mongo/bin 
+./mongod --dbpath ~/Apps/mongo-data/
+./mongo
+db.Todos.insert({text: "create a new node course"})
+db.Todos.find()
+
+
+For updating use MONGODB UPDATE OPERATORS
+
+// Mongoose
+it is used instead of native mongodb driver
+npm i mongoose@4.5.9 --save
+
+
+
