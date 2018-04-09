@@ -1,6 +1,6 @@
 var express = require('express');
 var bodyParser = require('body-parser');
-var {ObjectID} = require('mongodb');
+var { ObjectID } = require('mongodb');
 
 var {
     mongoose
@@ -34,11 +34,11 @@ app.post('/todos', (req, res) => {
 });
 
 // -- Add a new user
-app.post('/users', (req,res)=>{
+app.post('/users', (req, res) => {
     var user = new User({
         email: req.body.email
     });
-    user.save().then((doc)=>{
+    user.save().then((doc) => {
         res.send(doc);
     }, (e) => {
         res.status(400).send(e);
@@ -59,23 +59,39 @@ app.get('/todos', (req, res) => {
 // -- View one todo
 app.get('/todos/:id', (req, res) => {
     var id = req.params.id;
-    if(!ObjectID.isValid(id)){
+    if (!ObjectID.isValid(id)) {
         return res.status(404).send();
-     }
+    }
 
     Todo.findById(id).then((todo) => {
-         if(!todo){
+        if (!todo) {
             return res.status(404).send()
-         }
-         res.send({todo});
-        
+        }
+        res.send({ todo });
+
     }).catch((e) => {
         res.status(400).send();
     });
 });
- 
 
 
+// Deleting 
+app.delete('/todos/:id', (req, res) => {
+    var id = req.params.id;
+    if (!ObjectID.isValid(id)) {
+        return res.status(404).send();
+    }
+
+    Todo.findByIdAndRemove(id).then((todo) => {
+        if(!todo){
+            return res.status(404).send();
+        }
+        res.send(todo);
+    }).catch((e)=>{
+        res.status(400).send();
+    });
+
+});
 
 app.listen(port, () => {
     console.log(`Started up at port ${port}`);
