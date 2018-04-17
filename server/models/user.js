@@ -33,24 +33,40 @@ var UserSchema = new mongoose.Schema({
 
 // Instance method creation for individual users
 // -- Format how response is sent
-UserSchema.methods.toJSON = function() {
+UserSchema.methods.toJSON = function () {
   var user = this;
   var userObject = user.toObject();
 
   return _.pick(userObject, ['_id', 'email']);
 }
 
-
-// --  genaeratess the auth token and save user along with it
+// --  genaeratess the auth token and save user in DB
 UserSchema.methods.generateAuthToken = function () {
   var user = this;
   var access = 'auth';
-  var token = jwt.sign({_id: user._id.toHexString(), access}, 'abc123').toString();
+  var token = jwt.sign({ _id: user._id.toHexString(), access }, 'abc123').toString();
 
-  user.tokens.push({access, token});
+  user.tokens.push({ access, token });
 
-  return user.save().then(()=>{
+  return user.save().then(() => {
     return token;
+  });
+};
+
+UserSchema.statics.findByToken = function (token) {
+  var User = this;
+  var decodeed;
+
+  try {
+    decoded = jwt.verify(token, 'abc123');
+  } catch (error) {
+    return Promise.reject(); // argument passed in reject will be passed as e in catch where it is called
+  }
+
+  return User.findOne({
+    '_id': decoded._id,
+    'tokens.token': token,
+    'tokens.access': 'auth'
   });
 };
 
